@@ -20,11 +20,4 @@ namespace Storage.Models
         [DisplayName("Total Inventory Value")]
         public int InventoryValue { get; set; }
     }
-
-    public class ProductPageViewModel
-    {
-        public IEnumerable<LimitedProduct> Products { get; set; }
-        public string SelectedCategory { get; set; }
-        public SelectList CategoryList { get; set; }
-    }
 }
