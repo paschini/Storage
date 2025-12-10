@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Storage.Models.ProductViewModel>
+﻿@model ProductPageViewModel
 
 @{
     ViewData["Title"] = "productViewModel Products";
@@ -9,26 +9,40 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Search">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" name="searchField" placeholder="Search for name" autocomplete="on" />
+
+        <select name="selectedCategory" asp-for="SelectedCategory" asp-items="Model.CategoryList" class="form-select">
+            <option value="" selected disabled>--- Select Category ---</option>
+        </select>
+
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+        <button class="btn btn-danger" type="submit">Reset</button>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Products.First().Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                @Html.DisplayNameFor(model => model.Products.First().Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Count)
+                @Html.DisplayNameFor(model => model.Products.First().Count)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.InventoryValue)
+                @Html.DisplayNameFor(model => model.Products.First().InventoryValue)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Products) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)

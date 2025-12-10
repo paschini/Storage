@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -25,42 +26,45 @@ namespace Storage.Controllers
             return View(await _context.Product.ToListAsync());
         }
 
-        // GET Products with ProductsViewModel
+        // GET Products with ProductPageViewModel
         public async Task<IActionResult> ViewProducts()
         {
-            var productsToView = _context.Product.Select(product => new ProductViewModel
+            var distinctCategories = _context.Product.Select(p => p.Category).Distinct().ToList();
+
+            var productsToView = _context.Product.Select(product => new LimitedProduct
             {
-                Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
                 Count = product.Count,
-                InventoryValue = product.Count * product.Price
+                InventoryValue = product.Count * product.Price            
             });
 
-            return View(await productsToView.ToListAsync());
+            var viewModel = new ProductPageViewModel
+            {
+                Products = productsToView,
+                CategoryList = new SelectList(distinctCategories)
+            };
+
+            return View(viewModel);
         }
 
-        //POST: Products/Search
-        public async Task<IActionResult> Search(string searchField)
+        public async Task<IActionResult> Search(string searchField, string selectedCategory)
         {
-            if (!string.IsNullOrEmpty(searchField))
-            {
-                var result = _context.Product.Where(product => product.Category.Contains(searchField))
-                .Select(product => new Product
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    Count = product.Count,
-                    Category = product.Category,
-                    Shelf = product.Shelf
-                });
-                
-                return View(nameof(Index), await result.ToListAsync()); // finns inte "Search.cshtml"
-            }
-            else
-                return RedirectToAction(nameof(Index));
+            var result = _context.Product
+                    .Where(product => string.IsNullOrEmpty(searchField) || product.Name.Contains(searchField))
+                    .Where(product => string.IsNullOrEmpty(selectedCategory) || product.Category == selectedCategory)
+                    .Select(product => new Product
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = product.Price,
+                        Count = product.Count,
+                        Category = product.Category,
+                        Shelf = product.Shelf
+                    });
+
+            return View(nameof(Index), await result.ToListAsync()); // finns inte "Search.cshtml"
         }
 
 

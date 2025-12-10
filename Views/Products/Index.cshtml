@@ -4,6 +4,11 @@
     ViewData["Title"] = "Index";
 }
 
+@{  
+    var distinctCategories = Model.Select(p => p.Category).Distinct().ToList();
+    var categorySelectList = new SelectList(distinctCategories);
+}
+
 <h1>Index</h1>
 
 <p>
@@ -12,7 +17,12 @@
 
 <form asp-action="Search">
     <div class="input-group mb-3">
-        <input type="text" class="form-control" name="searchField" placeholder="Search for category" />
+        <input type="text" class="form-control" name="searchField" placeholder="Search for name" autocomplete="on" />
+
+        <select name="selectedCategory" asp-items="categorySelectList" class="form-select">
+            <option value="" selected disabled>--- Select Category ---</option>
+        </select>
+
         <button class="btn btn-outline-secondary" type="submit">Search</button>
         <button class="btn btn-danger" type="submit">Reset</button>
     </div>
