@@ -25,6 +25,46 @@ namespace Storage.Controllers
             return View(await _context.Product.ToListAsync());
         }
 
+        // GET Products with ProductsViewModel
+        public async Task<IActionResult> ViewProducts()
+        {
+            var productsToView = _context.Product.Select(product => new ProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Count = product.Count,
+                InventoryValue = product.Count * product.Price
+            });
+
+            return View(await productsToView.ToListAsync());
+        }
+
+        //POST: Products/Search
+        public async Task<IActionResult> Search(string searchField)
+        {
+            if (!string.IsNullOrEmpty(searchField))
+            {
+                var result = _context.Product.Where(product => product.Category.Contains(searchField))
+                .Select(product => new Product
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Count = product.Count,
+                    Category = product.Category,
+                    Shelf = product.Shelf
+                });
+                
+                return View(nameof(Index), await result.ToListAsync()); // finns inte "Search.cshtml"
+            }
+            else
+                return RedirectToAction(nameof(Index));
+        }
+
+
+
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
